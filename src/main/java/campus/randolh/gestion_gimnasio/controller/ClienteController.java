@@ -4,6 +4,11 @@ import campus.randolh.gestion_gimnasio.dto.ClienteRequestDTO;
 import campus.randolh.gestion_gimnasio.dto.ClienteResponseDTO;
 import campus.randolh.gestion_gimnasio.dto.RutinaResponseDTO;
 import campus.randolh.gestion_gimnasio.service.ClienteService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import java.util.List;
 import org.springframework.http.HttpStatus;
@@ -19,6 +24,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/api/clientes")
+@Tag(name = "Clientes", description = "Operaciones CRUD y gestion de rutinas de clientes")
 public class ClienteController {
 
     private final ClienteService clienteService;
@@ -28,6 +34,11 @@ public class ClienteController {
     }
 
     @PostMapping
+    @Operation(summary = "Crear un nuevo cliente", description = "Registra un cliente con documento unico")
+    @ApiResponses({
+        @ApiResponse(responseCode = "201", description = "Cliente creado exitosamente"),
+        @ApiResponse(responseCode = "400", description = "Datos invalidos o documento duplicado")
+    })
     public ResponseEntity<ClienteResponseDTO> crear(@Valid @RequestBody ClienteRequestDTO dto) {
         ClienteResponseDTO creado = clienteService.crear(dto);
         if (creado == null) {
@@ -37,12 +48,19 @@ public class ClienteController {
     }
 
     @GetMapping
+    @Operation(summary = "Listar todos los clientes")
+    @ApiResponse(responseCode = "200", description = "Lista de clientes")
     public ResponseEntity<List<ClienteResponseDTO>> listarTodos() {
         return ResponseEntity.ok(clienteService.listarTodos());
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<ClienteResponseDTO> obtenerPorId(@PathVariable Long id) {
+    @Operation(summary = "Obtener un cliente por su ID")
+    @ApiResponses({
+        @ApiResponse(responseCode = "200", description = "Cliente encontrado"),
+        @ApiResponse(responseCode = "404", description = "Cliente no encontrado")
+    })
+    public ResponseEntity<ClienteResponseDTO> obtenerPorId(@Parameter(description = "ID del cliente", example = "1") @PathVariable Long id) {
         ClienteResponseDTO c = clienteService.obtenerPorId(id);
         if (c == null) {
             return ResponseEntity.notFound().build();
@@ -51,7 +69,14 @@ public class ClienteController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<ClienteResponseDTO> actualizar(@PathVariable Long id, @Valid @RequestBody ClienteRequestDTO dto) {
+    @Operation(summary = "Actualizar un cliente")
+    @ApiResponses({
+        @ApiResponse(responseCode = "200", description = "Cliente actualizado"),
+        @ApiResponse(responseCode = "404", description = "Cliente no encontrado")
+    })
+    public ResponseEntity<ClienteResponseDTO> actualizar(
+            @Parameter(description = "ID del cliente", example = "1") @PathVariable Long id,
+            @Valid @RequestBody ClienteRequestDTO dto) {
         ClienteResponseDTO c = clienteService.actualizar(id, dto);
         if (c == null) {
             return ResponseEntity.notFound().build();
@@ -60,7 +85,12 @@ public class ClienteController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> eliminar(@PathVariable Long id) {
+    @Operation(summary = "Eliminar un cliente")
+    @ApiResponses({
+        @ApiResponse(responseCode = "204", description = "Cliente eliminado"),
+        @ApiResponse(responseCode = "404", description = "Cliente no encontrado")
+    })
+    public ResponseEntity<Void> eliminar(@Parameter(description = "ID del cliente", example = "1") @PathVariable Long id) {
         boolean eliminado = clienteService.eliminar(id);
         if (!eliminado) {
             return ResponseEntity.notFound().build();
@@ -69,7 +99,14 @@ public class ClienteController {
     }
 
     @PostMapping("/{clienteId}/rutinas/{rutinaId}")
-    public ResponseEntity<String> asignarRutina(@PathVariable Long clienteId, @PathVariable Long rutinaId) {
+    @Operation(summary = "Asignar una rutina a un cliente", description = "Vincula la rutina indicada con el cliente en la tabla intermedia")
+    @ApiResponses({
+        @ApiResponse(responseCode = "200", description = "Rutina asignada correctamente"),
+        @ApiResponse(responseCode = "404", description = "Cliente o Rutina no encontrados")
+    })
+    public ResponseEntity<String> asignarRutina(
+            @Parameter(description = "ID del cliente", example = "1") @PathVariable Long clienteId,
+            @Parameter(description = "ID de la rutina", example = "1") @PathVariable Long rutinaId) {
         boolean ok = clienteService.asignarRutina(clienteId, rutinaId);
         if (!ok) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Cliente o Rutina no encontrados");
@@ -78,7 +115,13 @@ public class ClienteController {
     }
 
     @GetMapping("/{clienteId}/rutinas")
-    public ResponseEntity<List<RutinaResponseDTO>> listarRutinasDeCliente(@PathVariable Long clienteId) {
+    @Operation(summary = "Listar todas las rutinas asignadas a un cliente")
+    @ApiResponses({
+        @ApiResponse(responseCode = "200", description = "Lista de rutinas"),
+        @ApiResponse(responseCode = "404", description = "Cliente no encontrado")
+    })
+    public ResponseEntity<List<RutinaResponseDTO>> listarRutinasDeCliente(
+            @Parameter(description = "ID del cliente", example = "1") @PathVariable Long clienteId) {
         List<RutinaResponseDTO> rutinas = clienteService.listarRutinasDeCliente(clienteId);
         if (rutinas == null) {
             return ResponseEntity.notFound().build();
@@ -87,7 +130,14 @@ public class ClienteController {
     }
 
     @DeleteMapping("/{clienteId}/rutinas/{rutinaId}")
-    public ResponseEntity<String> quitarRutina(@PathVariable Long clienteId, @PathVariable Long rutinaId) {
+    @Operation(summary = "Quitar una rutina a un cliente", description = "Desvincula la rutina del cliente eliminando el registro de la tabla intermedia")
+    @ApiResponses({
+        @ApiResponse(responseCode = "200", description = "Rutina desvinculada correctamente"),
+        @ApiResponse(responseCode = "404", description = "Cliente o Rutina no encontrados")
+    })
+    public ResponseEntity<String> quitarRutina(
+            @Parameter(description = "ID del cliente", example = "1") @PathVariable Long clienteId,
+            @Parameter(description = "ID de la rutina", example = "1") @PathVariable Long rutinaId) {
         boolean ok = clienteService.quitarRutina(clienteId, rutinaId);
         if (!ok) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Cliente o Rutina no encontrados");
