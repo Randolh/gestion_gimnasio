@@ -1,9 +1,17 @@
 package campus.randolh.gestion_gimnasio.dto;
 
+import io.swagger.v3.oas.annotations.media.Schema;
+
+@Schema(description = "Respuesta con los datos de una rutina")
 public class RutinaResponseDTO {
 
+    @Schema(description = "ID autoincremental de la rutina", example = "1")
     private Long id;
+
+    @Schema(description = "Nombre de la rutina", example = "Pierna Hipertrofia")
     private String nombre;
+
+    @Schema(description = "Nivel de dificultad", example = "INTERMEDIO")
     private String nivel;
 
     public RutinaResponseDTO() {
