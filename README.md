@@ -207,4 +207,4 @@ La aplicacion incluye la clase `DataLoader` (`CommandLineRunner`), la cual inici
 
 A continuacion se presenta el enlace con la grabacion demostrativa del funcionamiento de la API, explicando la estructura del proyecto, la relacion Many-to-Many en base de datos y la ejecucion de pruebas de cada endpoint en Swagger UI:
 
-- [VIDEO]()
+- [VIDEO](https://drive.google.com/file/d/1n_jPifthXIpAui4FY6N6tdPQsfocGpXW/view?usp=sharing)

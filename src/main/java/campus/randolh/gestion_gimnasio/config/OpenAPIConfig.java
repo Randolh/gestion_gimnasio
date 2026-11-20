@@ -18,6 +18,6 @@ public class OpenAPIConfig {
                         .description("API REST para la gestion de clientes y rutinas con relacion Many-to-Many.")
                         .contact(new Contact()
                                 .name("Randolh - Campus")
-                                .email("estudiante@campuslands.com")));
+                                .email("estuardotecun@gmail.com")));
     }
 }
